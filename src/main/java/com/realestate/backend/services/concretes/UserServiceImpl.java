@@ -19,11 +19,13 @@ import com.realestate.backend.services.abstracts.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,17 +50,25 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO registerUser(UserRequestDTO dto) {
 
         if (dto.getEmail() == null || dto.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Email is required"
+            );
         }
 
-        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new IllegalStateException("Email already taken");
+        String normalizedEmail = dto.getEmail().trim().toLowerCase();
+
+        if (userRepository.findByEmail(normalizedEmail).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Email already taken"
+            );
         }
 
         User user = new User();
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail().trim());
+        user.setEmail(normalizedEmail);
 
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -80,7 +90,10 @@ public class UserServiceImpl implements UserService {
 
         emailVerificationTokenRepository.save(token);
 
-        mailService.sendVerificationMail(savedUser.getEmail(), token.getToken());
+        mailService.sendVerificationMail(
+                savedUser.getEmail(),
+                token.getToken()
+        );
 
         return userMapper.responseFromUser(savedUser);
     }
