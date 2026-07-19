@@ -1,12 +1,10 @@
-version: "3.8"
-
 services:
   backend:
-    image: realestate_db
-    container_name: realestate_db
+    image: realestate-backend
+    container_name: realestate-backend
     build: .
     ports:
-      - "3012:8080"   # ana nginx ile uyumlu
+      - "3013:8080"
     restart: unless-stopped
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/realestate_db
@@ -17,15 +15,16 @@ services:
 
   postgres:
     image: postgres:16
-    container_name: realestate_db
+    container_name: realestate-db
     ports:
-      - "5435:5432"   # host port 5433 → container 5432
+      - "5435:5432"
     environment:
-      POSTGRES_DB: realestate-db
+      POSTGRES_DB: realestate_db
       POSTGRES_USER: realestate_user
       POSTGRES_PASSWORD: realestate_password
     volumes:
-      - realestate-pgdata:/var/lib/postgresql/data   # kalıcı veri
+      - realestate-pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
 
 volumes:
   realestate-pgdata:
