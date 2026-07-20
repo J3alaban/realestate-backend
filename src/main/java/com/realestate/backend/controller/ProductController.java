@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -117,4 +118,79 @@ public class ProductController {
                 .status(HttpStatus.CREATED)
                 .body(productService.uploadImage(file));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<ProductResponseDTO>> searchProducts(
+            @RequestParam String query,
+            @PageableDefault(size = 40) Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                productService.searchProducts(query, pageable)
+        );
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Page<ProductResponseDTO>> filterProducts(
+            @RequestParam(required = false)
+            String title,
+
+            @RequestParam(required = false)
+            Long categoryId,
+
+            @RequestParam(required = false)
+            Long subCategoryId,
+
+            @RequestParam(required = false)
+            String propertyType,
+
+            @RequestParam(required = false)
+            Integer roomCount,
+
+            @RequestParam(required = false)
+            String address,
+
+            @RequestParam(required = false)
+            String floor,
+
+            @RequestParam(required = false)
+            Double minSquareMeter,
+
+            @RequestParam(required = false)
+            Double maxSquareMeter,
+
+            @RequestParam(required = false)
+            Double minPrice,
+
+            @RequestParam(required = false)
+            Double maxPrice,
+
+            @PageableDefault(
+                    page = 0,
+                    size = 20,
+                    sort = "id"
+            )
+            Pageable pageable
+    ) {
+        Page<ProductResponseDTO> response =
+                productService.filterProducts(
+                        title,
+                        categoryId,
+                        subCategoryId,
+                        propertyType,
+                        roomCount,
+                        address,
+                        floor,
+                        minSquareMeter,
+                        maxSquareMeter,
+                        minPrice,
+                        maxPrice,
+                        pageable
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
+
 }

@@ -39,4 +39,26 @@ public interface ProductService {
     ProductResponseDTO getProductByBarcode(String barcode);
 
     String uploadImage(MultipartFile file);
+
+    Page<ProductResponseDTO> searchProducts(
+            String query,
+            Pageable pageable
+    );
+
+    Page<ProductResponseDTO> filterProducts(
+            String title,
+            Long categoryId,
+            Long subCategoryId,
+            String propertyType,
+            Integer roomCount,
+            String address,
+            String floor,
+            Double minSquareMeter,
+            Double maxSquareMeter,
+            Double minPrice,
+            Double maxPrice,
+            Pageable pageable
+    );
+
+
 }

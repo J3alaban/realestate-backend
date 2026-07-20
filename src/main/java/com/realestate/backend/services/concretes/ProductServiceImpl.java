@@ -13,10 +13,13 @@ import com.realestate.backend.repositories.ProductRepository;
 import com.realestate.backend.repositories.SubCategoryRepository;
 import com.realestate.backend.repositories.UserRepository;
 import com.realestate.backend.services.abstracts.ProductService;
+import com.realestate.backend.specifications.ProductFilterSpecification;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -353,4 +356,85 @@ public class ProductServiceImpl implements ProductService {
                 .substring(extensionIndex)
                 .toLowerCase();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDTO> searchProducts(
+            String query,
+            Pageable pageable
+    ) {
+        return productRepository
+                .searchProducts(query.trim(), pageable)
+                .map(productMapper::responseFromProduct);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDTO> filterProducts(
+            String title,
+            Long categoryId,
+            Long subCategoryId,
+            String propertyType,
+            Integer roomCount,
+            String address,
+            String floor,
+            Double minSquareMeter,
+            Double maxSquareMeter,
+            Double minPrice,
+            Double maxPrice,
+            Pageable pageable
+    ) {
+        validateRanges(
+                minSquareMeter,
+                maxSquareMeter,
+                minPrice,
+                maxPrice
+        );
+
+        Specification<Product> specification =
+                ProductFilterSpecification.filter(
+                        title,
+                        categoryId,
+                        subCategoryId,
+                        propertyType,
+                        roomCount,
+                        address,
+                        floor,
+                        minSquareMeter,
+                        maxSquareMeter,
+                        minPrice,
+                        maxPrice
+                );
+
+        return productRepository
+                .findAll(specification, pageable)
+                .map(productMapper::responseFromProduct);
+    }
+
+    private void validateRanges(
+            Double minSquareMeter,
+            Double maxSquareMeter,
+            Double minPrice,
+            Double maxPrice
+    ) {
+        if (minPrice != null &&
+                maxPrice != null &&
+                minPrice > maxPrice) {
+            throw new IllegalArgumentException(
+                    "Minimum fiyat maksimum fiyattan büyük olamaz."
+            );
+        }
+
+        if (minSquareMeter != null &&
+                maxSquareMeter != null &&
+                minSquareMeter > maxSquareMeter) {
+            throw new IllegalArgumentException(
+                    "Minimum metrekare maksimum metrekareden büyük olamaz."
+            );
+        }
+    }
+
+
+
+
 }
