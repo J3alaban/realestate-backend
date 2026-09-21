@@ -31,9 +31,17 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse create(CategoryRequestDTO requestDTO) {
 
-        if (categoryRepository.findBySlug(requestDTO.getSlug()).isPresent()) {
+        String slug = requestDTO.getSlug();
+
+        if (slug == null || slug.isBlank()) {
+            slug = "slug" + requestDTO.getName();
+        }
+
+        if (categoryRepository.findBySlug(slug).isPresent()) {
             throw new RuntimeException("Category with this slug already exists");
         }
+
+        requestDTO.setSlug(slug);
 
         Category category = categoryMapper.toEntity(requestDTO);
 
