@@ -34,6 +34,9 @@ public class User  extends BaseEntity implements UserDetails {
 
 
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subscription_plan", nullable = false)
+    private SubscriptionPlan subscriptionPlan = SubscriptionPlan.FREE;
 
 
     @Email
@@ -59,7 +62,7 @@ public class User  extends BaseEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // User'ın rolüne göre authorities oluşturuyoruz
+
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
     }
 

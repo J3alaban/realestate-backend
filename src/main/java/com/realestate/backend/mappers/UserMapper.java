@@ -25,14 +25,15 @@ public interface UserMapper {
     @Mapping(source = "lastName", target = "lastName")
     @Mapping(source = "email", target = "email")
 
-    UserResponseDTO toResponseDTO(User user);
 
+    UserResponseDTO toResponseDTO(User user);
 
 
 
 
     // PROFILE / ME
     @Mapping(source = "phone", target = "phone")
+    @Mapping(source = "subscriptionPlan", target = "subscriptionPlan")
     UserResponseDTO responseFromUser(User user);
 
 

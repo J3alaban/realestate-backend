@@ -23,7 +23,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>,
     Page<Product> findByCategory(Category category, Pageable pageable);
 
     Optional<Product> findByBarcode(String barcode);
-
+    long countByUser_Id(Long userId);
     @Query("""
         SELECT p FROM Product p
         WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))

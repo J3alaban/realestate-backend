@@ -79,7 +79,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserProfile(userId));
     }
 
-    // ✔ USER'A AİT ZİMMETLER
+
     @GetMapping("/{userId}/products")
     public ResponseEntity<Page<ProductResponseDTO>> getUserProducts(
             @PathVariable Long userId,

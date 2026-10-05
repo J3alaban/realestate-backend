@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.realestate.backend.entities.SubscriptionPlan;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -90,6 +91,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public long getUserProductCount(Long userId) {
+        return productRepository.countByUser_Id(userId);
+    }
+
+    @Override
     public Page<ProductResponseDTO> getAllProducts(Pageable pageable) {
 
         return productRepository.findAll(pageable)
@@ -117,6 +123,23 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found")
                 );
+
+        // Kullanıcının mevcut ilan sayısını al
+        long productCount = getUserProductCount(userId);
+
+        // Abonelik planı yoksa FREE kabul edilir
+        SubscriptionPlan plan = user.getSubscriptionPlan();
+
+        if (plan == null) {
+            plan = SubscriptionPlan.FREE;
+        }
+
+        // Abonelik planına göre ilan limitini kontrol et
+        if (productCount >= plan.getMaxListings()) {
+            throw new IllegalArgumentException(
+                    "Mevcut abonelik planınızın ilan limiti dolmuştur."
+            );
+        }
 
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() ->

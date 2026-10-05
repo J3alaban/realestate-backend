@@ -60,5 +60,6 @@ public interface ProductService {
             Pageable pageable
     );
 
+    long getUserProductCount(Long userId);
 
 }
