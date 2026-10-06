@@ -20,7 +20,7 @@ public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "subCategory", ignore = true)
-    @Mapping(target = "user", ignore = true) // 🔥 eksikti
+    @Mapping(target = "user", ignore = true) //
     @Mapping(target = "dimensions", expression = "java(mapDimensions(request.getDimensions()))")
     @Mapping(target = "images", expression = "java(mapImages(request.getImages()))")
     @Mapping(target = "barcode", ignore = true)

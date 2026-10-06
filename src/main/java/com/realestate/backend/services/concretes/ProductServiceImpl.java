@@ -146,9 +146,12 @@ public class ProductServiceImpl implements ProductService {
                         new ResourceNotFoundException("Category not found")
                 );
 
+        // Alt kategori opsiyoneldir
         SubCategories subCategory = null;
 
-        if (dto.getSubCategoryId() != null) {
+        if (dto.getSubCategoryId() != null
+                && dto.getSubCategoryId() > 0) {
+
             subCategory = subCategoryRepository
                     .findById(dto.getSubCategoryId())
                     .orElseThrow(() ->
